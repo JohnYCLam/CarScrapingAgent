@@ -19,6 +19,38 @@ car-scraping-agent/
 │ └─ scraping/
 └─ scripts/
 ```
+
+## The Mission
+Finding the perfect used car deal manually is time-consuming. This agent automates the search by:
+
+Scraping raw HTML from automotive marketplaces.
+
+Processing unstructured data into clean JSON using LangChain and LLMs.
+
+Storing results in the cloud and notifying the user of new finds.
+
+## Tech Stack & Tools
+**Artificial Intelligence**
+LangChain: Orchestrates the workflow and handles prompt engineering.
+
+LLMs (OpenAI/Anthropic): Used to "read" the webpage and extract car specs (Price, Mileage, Year, Condition).
+
+Cloud Infrastructure (AWS)
+AWS Lambda: Serverless execution of scraping tasks.
+
+AWS S3: Persistent storage for raw HTML snapshots and processed JSON data.
+
+AWS SES (Simple Email Service): Automated email alerts when a target car is found.
+
+AWS IAM: Fine-grained security and permissions management.
+
+Engineering Excellence
+Pydantic: Strict data validation via schemas.py.
+
+Conda: Reproducible environment management via environment.yml.
+
+Scripts: Unit testing suite for scraping logic and data integrity.
+
 ## Prerequisites
 
 - Conda (Anaconda / Miniconda / Miniforge)
@@ -142,6 +174,7 @@ This repo is structured so code is modular and testable before deployment.
 ## License
 
 Personal project / educational use.
+
 
 
 
