@@ -1,10 +1,7 @@
 # Car Scraping Agent (Drive.com.au) + LLM + AWS
 
-A Python project that:
-- Extracts car search criteria from natural language using an OpenAI model (LangChain structured output).
-- Scrapes car listings from **Drive.com.au** and parses listing cards via an LLM batch parser.
-- Stores one-time searches and recurring queries in DynamoDB.
-- (Optional) Schedules recurring runs via EventBridge Scheduler and emails updates via SES.
+A modular, AI-powered prototype agent designed to crawl, extract, and process used car sales information. This project serves as a comprehensive demonstration of **end-to-end cloud deployment**, moving from local Python scripts to a fully serverless architecture on AWS. The idea originates from building an AI agent to assist me to consolidate used car sales information.
+
 
 ## Project structure
 ```
@@ -145,6 +142,7 @@ This repo is structured so code is modular and testable before deployment.
 ## License
 
 Personal project / educational use.
+
 
 
 
