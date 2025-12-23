@@ -1,0 +1,17 @@
+name: car-scraper
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - boto3
+    - requests
+    - beautifulsoup4
+    - langchain
+    - langchain_core 
+    - langchain_classic 
+    - langchain_openai
+    - lxml
+    - python-dotenv

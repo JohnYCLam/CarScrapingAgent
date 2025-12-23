@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Car Scraper Agent</title>
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+      max-width: 900px; 
+      margin: 2rem auto; 
+      padding: 0 1rem;
+      line-height: 1.6;
+    }
+    .chat-container {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    textarea { 
+      width: 100%; 
+      height: 100px; 
+      padding: 12px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 16px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    button { 
+      background: #3b82f6;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 0.75rem;
+      transition: background 0.2s;
+    }
+    button:hover:not(:disabled) { background: #2563eb; }
+    button:disabled { background: #9ca3af; cursor: not-allowed; }
+    #newChatBtn {
+      background: #6b7280;
+      padding: 8px 16px;
+      font-size: 14px;
+      margin-top: 0;
+    }
+    #newChatBtn:hover { background: #4b5563; }
+    .message-input { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 0.75rem; 
+    }
+    .message-input-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .message-input-row button {
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+    .chat-messages {
+      max-height: 400px;
+      overflow-y: auto;
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      border: 1px solid #e5e7eb;
+    }
+    .message { 
+      margin-bottom: 1rem; 
+      padding: 12px 16px;
+      border-radius: 8px;
+    }
+    .user-message { 
+      background: #3b82f6; 
+      color: white; 
+      margin-left: 20%;
+      border-bottom-right-radius: 4px;
+    }
+    .agent-message { 
+      background: #f3f4f6; 
+      color: #374151;
+      margin-right: 20%;
+      border-bottom-left-radius: 4px;
+    }
+    .status { 
+      font-size: 0.875rem; 
+      color: #6b7280; 
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+    .user-id {
+      background: #10b981;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    pre { 
+      background: #1f2937; 
+      color: #f9fafb;
+      padding: 1rem;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      font-size: 0.875rem;
+      overflow-x: auto;
+    }
+    .loading { animation: pulse 1.5s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🚗 Car Scraper Agent</h1>
+  <div class="status">
+    Your ID: <span class="user-id" id="userIdDisplay">--</span> 
+    (persistent across sessions)
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="message-input">
+      <textarea 
+        id="message" 
+        placeholder="e.g. Mazda CX-3 used car from 2019 under $28k in Victoria"
+      ></textarea>
+      <div class="message-input-row">
+        <button id="sendBtn" disabled>Send</button>
+        <button id="newChatBtn">New Chat</button>
+      </div>
+    </div>
+  </div>
+
+  <details>
+    <summary>Debug: Raw Response (click to expand)</summary>
+    <pre id="debugResponse">No response yet</pre>
+  </details>
+
+  <script>
+    // === CONFIG ===
+    const API_URL = "https://j0nqhhk6h9.execute-api.ap-southeast-2.amazonaws.com/chat";
+    const STORAGE_KEY_USER = 'car_scraper_user_id';
+    const STORAGE_KEY_SESSION = 'car_scraper_session_data';
+
+    // === PERSISTENT USER ID + SESSION ===
+    let user_id = localStorage.getItem(STORAGE_KEY_USER);
+    let session_data = JSON.parse(localStorage.getItem(STORAGE_KEY_SESSION) || '{}');
+
+    if (!user_id) {
+      user_id = 'web-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem(STORAGE_KEY_USER, user_id);
+    }
+    
+    document.getElementById('userIdDisplay').textContent = user_id;
+    document.getElementById('userIdDisplay').title = 'Your persistent user ID';
+
+    // === UI ELEMENTS ===
+    const messageInput = document.getElementById('message');
+    const sendBtn = document.getElementById('sendBtn');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const chatMessages = document.getElementById('chatMessages');
+    const debugResponse = document.getElementById('debugResponse');
+
+    // === CHAT FUNCTIONALITY ===
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && e.ctrlKey) sendMessage();
+    });
+
+    messageInput.addEventListener('input', () => {
+      sendBtn.disabled = !messageInput.value.trim();
+    });
+
+    // === NEW CHAT BUTTON ===
+    newChatBtn.addEventListener('click', () => {
+      session_data = {};
+      localStorage.removeItem(STORAGE_KEY_SESSION);
+      chatMessages.innerHTML = '';
+      messageInput.value = '';
+      debugResponse.textContent = '🆕 New chat started - fresh session!';
+      sendBtn.disabled = true;
+      messageInput.focus();
+    });
+
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+
+      // Add user message to chat
+      addMessage('user', message);
+      messageInput.value = '';
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Sending...';
+      sendBtn.classList.add('loading');
+
+      try {
+        const payload = {
+          user_id: user_id,
+          message: message.trim(),
+          session_data: session_data
+        };
+
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        debugResponse.textContent = JSON.stringify(data, null, 2);
+
+        // Update session data from response
+        if (data.session_data) {
+          session_data = data.session_data;
+          localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session_data));
+        }
+
+        // Add agent response
+        const agentMsg = data.response || data.message || 'No response content';
+        addMessage('agent', agentMsg);
+
+      } catch (error) {
+        console.error('Error:', error);
+        addMessage('agent', `Error: ${error.message}`);
+        debugResponse.textContent = `Error: ${error.message}`;
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Send';
+        sendBtn.classList.remove('loading');
+        messageInput.focus();
+      }
+    }
+
+    function addMessage(sender, content) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}-message`;
+      
+      if (sender === 'agent' && content.includes('"response":')) {
+        // Don't show raw JSON in chat, only in debug
+        content = content.replace(/\{.*response.*\}/s, '[Technical response logged below]');
+      }
+      
+      messageDiv.innerHTML = `<div>${content}</div>`;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Load any previous messages from session on page load
+    messageInput.focus();
+  </script>
+</body>
+</html>
