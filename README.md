@@ -31,25 +31,28 @@ Storing results in the cloud and notifying the user of new finds.
 
 ## Tech Stack & Tools
 **Artificial Intelligence**
-LangChain: Orchestrates the workflow and handles prompt engineering.
 
-LLMs (OpenAI/Anthropic): Used to "read" the webpage and extract car specs (Price, Mileage, Year, Condition).
+**LangChain**: Orchestrates the workflow and handles prompt engineering.
 
-Cloud Infrastructure (AWS)
-AWS Lambda: Serverless execution of scraping tasks.
+**LLMs (OpenAI/Anthropic)**: Used to "read" the webpage and extract car specs (Price, Mileage, Year, Condition).
 
-AWS S3: Persistent storage for raw HTML snapshots and processed JSON data.
+**Cloud Infrastructure (AWS)**
 
-AWS SES (Simple Email Service): Automated email alerts when a target car is found.
+**AWS Lambda**: Serverless execution of scraping tasks.
 
-AWS IAM: Fine-grained security and permissions management.
+**AWS S3**: Persistent storage for raw HTML snapshots and processed JSON data.
 
-Engineering Excellence
-Pydantic: Strict data validation via schemas.py.
+**AWS SES**: Automated email alerts when a target car is found.
 
-Conda: Reproducible environment management via environment.yml.
+**AWS IAM**: Fine-grained security and permissions management.
 
-Scripts: Unit testing suite for scraping logic and data integrity.
+**Engineering Excellence**
+
+**Pydantic**: Strict data validation via schemas.py.
+
+**Conda**: Reproducible environment management via environment.yml.
+
+**Scripts**: Unit testing suite for scraping logic and data integrity.
 
 ## Prerequisites
 
@@ -65,10 +68,10 @@ Docker is only needed to run **DynamoDB Local** for local testing (so you don’
 ### 1) Create the Conda environment
 
 From the project root (where `environment.yml` lives):
-
+```
 conda env create -f environment.yml
 conda activate car-scraper
-
+```
 Conda reads dependencies from the YAML file and creates the environment. [web:317][web:318]
 
 ### 2) Configure environment variables
@@ -174,6 +177,7 @@ This repo is structured so code is modular and testable before deployment.
 ## License
 
 Personal project / educational use.
+
 
 
 
