@@ -9,6 +9,7 @@ A Python project that:
 ## Project structure
 
 car-scraping-agent/
+
 ├─ environment.yml
 ├─ README.md
 ├─ src/
@@ -142,4 +143,5 @@ This repo is structured so code is modular and testable before deployment.
 - If you see 403s, reduce scraping frequency, try fewer pages, or switch to a headless browser approach.
 
 ## License
+
 Personal project / educational use.
