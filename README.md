@@ -20,7 +20,7 @@ car-scraping-agent/
 │ ├─ aws/
 │ ├─ llm/
 │ └─ scraping/
-└─ tests/
+└─ scripts/
 ```
 ## Prerequisites
 
@@ -145,5 +145,6 @@ This repo is structured so code is modular and testable before deployment.
 ## License
 
 Personal project / educational use.
+
 
 
