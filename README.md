@@ -7,7 +7,7 @@ A Python project that:
 - (Optional) Schedules recurring runs via EventBridge Scheduler and emails updates via SES.
 
 ## Project structure
-'''
+```
 car-scraping-agent/
 
 ├─ environment.yml
@@ -21,7 +21,7 @@ car-scraping-agent/
 │ ├─ llm/
 │ └─ scraping/
 └─ tests/
-'''
+```
 ## Prerequisites
 
 - Conda (Anaconda / Miniconda / Miniforge)
@@ -145,4 +145,5 @@ This repo is structured so code is modular and testable before deployment.
 ## License
 
 Personal project / educational use.
+
 
