@@ -61,7 +61,7 @@ Storing results in the cloud and notifying the user of new finds.
 - An OpenAI API key set as `OPENAI_API_KEY`
 
 ### Why Docker is used here
-Docker is only needed to run **DynamoDB Local** for local testing (so you don’t hit AWS while developing). DynamoDB Local is typically exposed at `http://localhost:8000`. [web:244][web:379]
+Docker is only needed to run **DynamoDB Local** for local testing (so you don’t hit AWS while developing). DynamoDB Local is typically exposed at `http://localhost:8000`.
 
 ## Setup (local development)
 
@@ -72,7 +72,7 @@ From the project root (where `environment.yml` lives):
 conda env create -f environment.yml
 conda activate car-scraper
 ```
-Conda reads dependencies from the YAML file and creates the environment. [web:317][web:318]
+Conda reads dependencies from the YAML file and creates the environment. 
 
 ### 2) Configure environment variables
 
@@ -118,7 +118,7 @@ docker stop dynamodb-local
 ### 1) Quick scrape test
 
 Create `scripts/test_scrape.py` (or run in a notebook):
-
+```
 from car_agent.config import Settings
 from car_agent.llm.client import build_llm
 from car_agent.scraping.drive_scraper import scrape_drive
@@ -131,14 +131,14 @@ results = scrape_drive(criteria, llm=llm, max_results=30, max_page=2)
 
 print("count:", len(results))
 print(results[:3])
-
+```
 Run it:
 python scripts/test_scrape.py
 
 ### 2) DynamoDB Local test (boto3 endpoint)
 
 Create `scripts/test_dynamodb_local.py`:
-
+```
 import boto3
 
 dynamodb = boto3.resource(
@@ -151,8 +151,8 @@ aws_secret_access_key="fake",
 
 print("Connected to DynamoDB Local")
 print([t.name for t in dynamodb.tables.all()])
-
-This uses `endpoint_url="http://localhost:8000"` to target DynamoDB Local. [web:244][web:379]
+```
+This uses `endpoint_url="http://localhost:8000"` to target DynamoDB Local.
 
 ## AWS deployment (high level)
 
@@ -161,7 +161,7 @@ When you deploy to AWS Lambda:
 def lambda_handler(event, context):
 ...
 
-Lambda calls a handler function with `(event, context)`. [web:363]
+Lambda calls a handler function with `(event, context)`.
 - You can deploy as:
 - ZIP (simpler for small deps), or
 - Container image (more control over native deps).
@@ -177,6 +177,7 @@ This repo is structured so code is modular and testable before deployment.
 ## License
 
 Personal project / educational use.
+
 
 
 
